@@ -13,105 +13,162 @@ defmodule JsonpathTest do
   end
 
   test "triply nested path" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => %{
-          "bae" => "value"
-        }
-      }
-    }, "fam.lit.bae") == "value"
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => %{
+                   "bae" => "value"
+                 }
+               }
+             },
+             "fam.lit.bae"
+           ) == "value"
   end
 
   test "partially fulfilling path" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => %{
-          "bae" => "value"
-        }
-      }
-    }, "fam.lit") == %{"bae" => "value"}
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => %{
+                   "bae" => "value"
+                 }
+               }
+             },
+             "fam.lit"
+           ) == %{"bae" => "value"}
   end
 
   test "doubly nested path with trailing list, 0th index" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => [
-          "coffee",
-          "beer"
-        ]
-      }
-    }, "fam.lit[0]") == "coffee"
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => [
+                   "coffee",
+                   "beer"
+                 ]
+               }
+             },
+             "fam.lit[0]"
+           ) == "coffee"
   end
 
   test "doubly nested path with trailing list, 1st index" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => [
-          "coffee",
-          "beer"
-        ]
-      }
-    }, "fam.lit[1]") == "beer"
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => [
+                   "coffee",
+                   "beer"
+                 ]
+               }
+             },
+             "fam.lit[1]"
+           ) == "beer"
   end
 
   test "doubly nested path with trailing list, out of bounds index" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => [
-          "coffee",
-          "beer"
-        ]
-      }
-    }, "fam.lit[2]") == nil
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => [
+                   "coffee",
+                   "beer"
+                 ]
+               }
+             },
+             "fam.lit[2]"
+           ) == nil
   end
 
   test "doubly nested path with trailing list, invalid index" do
     assert_raise ParseError, "Invalid index 'xy' in token 'lit[xy]'", fn ->
-      Jsonpath.path(%{
-        "fam" => %{
-          "lit" => [
-            "coffee",
-            "beer"
-          ]
-        }
-      }, "fam.lit[xy]")
+      Jsonpath.path(
+        %{
+          "fam" => %{
+            "lit" => [
+              "coffee",
+              "beer"
+            ]
+          }
+        },
+        "fam.lit[xy]"
+      )
     end
   end
 
   test "doubly nested path with with list at 0th index, trailing single path" do
-    assert Jsonpath.path(%{
-      "fam" => %{
-        "lit" => [
-          %{"drink" => "coffee"},
-          %{"drink" => "beer"}
-        ]
-      }
-    }, "fam.lit[0].drink") == "coffee"
+    assert Jsonpath.path(
+             %{
+               "fam" => %{
+                 "lit" => [
+                   %{"drink" => "coffee"},
+                   %{"drink" => "beer"}
+                 ]
+               }
+             },
+             "fam.lit[0].drink"
+           ) == "coffee"
   end
 
   test "doubly nested path with with list at 0th index, expected trailing map" do
     assert_raise ParseError, "Expected map but instead got 1", fn ->
-      Jsonpath.path(%{
-        "fam" => %{
-          "lit" => [
-            1,
-            2
-          ]
-        }
-      }, "fam.lit[0].drink")
+      Jsonpath.path(
+        %{
+          "fam" => %{
+            "lit" => [
+              1,
+              2
+            ]
+          }
+        },
+        "fam.lit[0].drink"
+      )
     end
   end
 
   test "triply nested path, expected trailing list" do
     assert_raise ParseError, "Expected list but instead got %{\"a\" => 1, \"b\" => 2}", fn ->
-      Jsonpath.path(%{
-        "fam" => %{
-          "lit" => %{
-            "a" => 1,
-            "b" => 2
+      Jsonpath.path(
+        %{
+          "fam" => %{
+            "lit" => %{
+              "a" => 1,
+              "b" => 2
+            }
           }
-        }
-      }, "fam.lit[0]")
+        },
+        "fam.lit[0]"
+      )
+    end
+  end
+
+  test "(atomic keys): doubly nested path with with list at 0th index, trailing single path" do
+    assert Jsonpath.path(
+             %{
+               fam: %{
+                 lit: [
+                   %{"drink" => "coffee"},
+                   %{"drink" => "beer"}
+                 ]
+               }
+             },
+             ":fam.:lit[0].drink"
+           ) == "coffee"
+  end
+
+  test "(atomic keys): allows only existing atoms as keys" do
+    assert_raise ArgumentError, fn ->
+      Jsonpath.path(
+        %{
+          fam: %{
+            lit: [
+              %{"drink" => "coffee"},
+              %{"drink" => "beer"}
+            ]
+          }
+        },
+        ":atom_does_not_exist.:lit[0].drink"
+      ) == "coffee"
     end
   end
 end
