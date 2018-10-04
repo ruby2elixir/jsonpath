@@ -6,19 +6,25 @@ defmodule Jsonpath do
     Enum.reduce(tokens, map, &handle_token/2)
   end
 
-  def handle_token(token, node) do
-    case Regex.run(~r/.*\[(.+)\]/, token) do
-      [_, index_str] ->
-        [key | _] = String.split(token, "[")
-        index = parse_int(index_str, token)
+  @regex ~r/.*\[(.+)\]/
 
-        node
-        |> Map.get(key |> transformkey)
-        |> handle_list(index)
+  def handle_token(token, node) do
+    case Regex.run(@regex, token) do
+      [_, index_str] ->
+        handle_list_index(node, index_str, token)
 
       nil ->
         handle_map(node, token)
     end
+  end
+
+  def handle_list_index(node, index_str, token) do
+    [key | _] = String.split(token, "[")
+    index = parse_int(index_str, token)
+
+    node
+    |> Map.get(key |> transformkey)
+    |> handle_list(index)
   end
 
   def handle_map(map, key) when is_map(map) do
