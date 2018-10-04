@@ -22,7 +22,8 @@ defmodule Jsonpath.MixProject do
   defp deps do
     [
       {:mix_test_watch, "~> 0.6", only: :dev, runtime: false},
-      {:benchee, "> 0.0.0", only: :dev, runtime: false}
+      {:benchee, "> 0.0.0", only: :dev, runtime: false},
+      {:jqish, github: "rozap/jqish"}
     ]
   end
 end
