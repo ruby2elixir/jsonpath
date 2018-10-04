@@ -23,7 +23,7 @@ defmodule Jsonpath do
     index = parse_int(index_str, token)
 
     node
-    |> Map.get(key |> transformkey)
+    |> handle_map(key)
     |> handle_list(index)
   end
 
