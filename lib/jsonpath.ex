@@ -47,6 +47,6 @@ defmodule Jsonpath do
     end
   end
 
-  defp transformkey(":" <> key), do: String.to_existing_atom(key)
+  defp transformkey("<atom>" <> key), do: String.to_existing_atom(key)
   defp transformkey(key), do: key
 end

@@ -152,7 +152,7 @@ defmodule JsonpathTest do
                  ]
                }
              },
-             ":fam.:lit[0].drink"
+             "<atom>fam.<atom>lit[0].drink"
            ) == "coffee"
   end
 
@@ -167,7 +167,7 @@ defmodule JsonpathTest do
             ]
           }
         },
-        ":atom_does_not_exist.:lit[0].drink"
+        "<atom>does_not_exist.:lit[0].drink"
       ) == "coffee"
     end
   end
