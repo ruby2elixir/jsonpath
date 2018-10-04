@@ -20,6 +20,9 @@ defmodule Jsonpath.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    [{:mix_test_watch, "~> 0.6", only: :dev, runtime: false}]
+    [
+      {:mix_test_watch, "~> 0.6", only: :dev, runtime: false},
+      {:benchee, "> 0.0.0", only: :dev, runtime: false}
+    ]
   end
 end
